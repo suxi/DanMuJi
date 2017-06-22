@@ -2,7 +2,7 @@
 
 namespace DanMuJi
 {
-    public class Class1
+    public class Comm
     {
     }
 }

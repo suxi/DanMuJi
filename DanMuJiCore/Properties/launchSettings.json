@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "DanMuJiCore": {
+      "commandName": "Project",
+      "commandLineArgs": "http://live.bilibili.com/412"
+    }
+  }
+}
