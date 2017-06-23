@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.13
+VisualStudioVersion = 15.0.26430.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DanMuJi", "DanMuJi\DanMuJi.csproj", "{187D7DB6-F0A7-4519-98A1-664D824337B6}"
 EndProject
@@ -10,6 +10,11 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DanMuJiCore", "DanMuJiCore\DanMuJiCore.csproj", "{E220CE53-2768-4AF8-B280-0CF7F59F232D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DanMuJi.Net47", "DanMuJi.Net47\DanMuJi.Net47.csproj", "{E47D0F73-EC45-467A-A9E1-1FCAA8A2434C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{90B8874F-F1B0-4F02-BEAF-33F635539097}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE.txt = LICENSE.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
