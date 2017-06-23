@@ -12,12 +12,16 @@ using System.Xml.Linq;
 
 namespace DanMuJi.Bilibili
 {
-    public class DanMuji
+    public class DanMuJi : IDanMuJi
     {
         private TcpClient tcpClient;
         private Task heartbeat;
         private Task reciever;
-
+        private DanMuPa parser;
+        public DanMuJi()
+        {
+            parser = new DanMuPa();
+        }
         public async Task ConnectAsync(string url)
         {
             using (tcpClient = new TcpClient())
@@ -54,7 +58,7 @@ namespace DanMuJi.Bilibili
                 Console.WriteLine($"Connect to Room {roomId} on {host}:{port}");
                 tcpClient.NoDelay = true;
                 await tcpClient.ConnectAsync(host, port);
-                var parser = new DanMuPa();
+
                 using (var stream = tcpClient.GetStream())
                 {
                     stream.Write(data.ToArray(), 0, data.Count);
