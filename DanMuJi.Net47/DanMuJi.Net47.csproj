@@ -7,7 +7,7 @@
     <ProjectGuid>{E47D0F73-EC45-467A-A9E1-1FCAA8A2434C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>DanMuJi.Net47</RootNamespace>
-    <AssemblyName>DanMuJi.Net47</AssemblyName>
+    <AssemblyName>DanMuJi</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -47,6 +47,12 @@
     </Compile>
     <Compile Include="..\DanMuJi\Comm.cs">
       <Link>Comm.cs</Link>
+    </Compile>
+    <Compile Include="..\DanMuJi\Douyu\DanMuJi.cs">
+      <Link>Douyu\DanMuJi.cs</Link>
+    </Compile>
+    <Compile Include="..\DanMuJi\Douyu\DanMuPa.cs">
+      <Link>Douyu\DanMuPa.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

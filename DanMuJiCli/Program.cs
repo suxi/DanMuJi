@@ -16,6 +16,10 @@ namespace DanMuJiCli
             {
                 Console.WriteLine("DanMuJiCli <url>");
             }
+            if (args.Length > 2 && args[1].ToLower() == "-d")
+            {
+                client.ConnectAsync(args[0], new DanMuJi.Option { ShowDanmu = true, ShowGift = true, ShowSystem = false }).Wait();
+            }
             else
             {
                 client.ConnectAsync(args[0]).Wait();

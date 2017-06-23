@@ -14,6 +14,17 @@ namespace DanMuJi.Bilibili
             Live, Preparing,Danmu,Gift,Welcome,Dammy
         }
 
+        private Option option;
+
+        public DanMuPa():this(new Option { ShowGift = true, ShowDanmu = false, ShowSystem = false })
+        {
+
+        }
+        public DanMuPa(Option option)
+        {
+            this.option = option;
+        }
+
         public string ParsePackage(Byte[] data)
         {
             var header = new Byte[12];
@@ -25,7 +36,8 @@ namespace DanMuJi.Bilibili
                     return "Has connected into room...";
                 case 0x05:
                     var text = Encoding.UTF8.GetString(data, 0x0C, data.Length - 0x0C);
-                    if (ParseMessage(text) == MessageType.Gift)
+                    var type = ParseMessage(text);
+                    if (type == MessageType.Gift  || type == MessageType.Danmu)
                     {
                         return text;
                     }
@@ -48,13 +60,14 @@ namespace DanMuJi.Bilibili
             var json = JObject.Parse(message);
             if (json["cmd"] != null)
             {
-                if (json.Value<string>("cmd") == "SEND_GIFT")
+                switch (json.Value<string>("cmd"))
                 {
-                    return MessageType.Gift;
-                }
-                else
-                {
-                    return MessageType.Dammy;
+                    case "SEND_GIFT":
+                        return MessageType.Gift;
+                    case "DANMU_MSG":
+                        return MessageType.Danmu;
+                    default:
+                        return MessageType.Dammy;
                 }
             }
             else

@@ -7,8 +7,15 @@ namespace DanMuJi
 {
     public interface IDanMuJi
     {
-        Task ConnectAsync(string url);
+        Task ConnectAsync(string url, Option? option = null);
 
+    }
+
+    public struct Option
+    {
+        public bool ShowDanmu;
+        public bool ShowGift;
+        public bool ShowSystem;
     }
 
     public class Platforms : Dictionary<TypeInfo, List<string>>

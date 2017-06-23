@@ -18,12 +18,18 @@ namespace DanMuJi.Bilibili
         private Task heartbeat;
         private Task reciever;
         private DanMuPa parser;
+
         public DanMuJi()
         {
             parser = new DanMuPa();
         }
-        public async Task ConnectAsync(string url)
+        public async Task ConnectAsync(string url, Option? option = null)
         {
+            if (option.HasValue)
+            {
+                parser = new DanMuPa(option.Value);
+            }
+
             using (tcpClient = new TcpClient())
             {
 
@@ -33,43 +39,27 @@ namespace DanMuJi.Bilibili
                 var reg = new Regex(@"var\s+ROOMID\s+=\s+(\w+);");
                 var match = reg.Match(bodyText);
                 var roomId = match.Groups[1].Value;
-                // 获得tcp服务器地址
 
+                // 获得tcp服务器地址
                 var xmlText = await httpClient.GetStringAsync($"http://live.bilibili.com/api/player?id=cid:{roomId}");
                 var xml = XElement.Parse($"<root>{xmlText}</root>");
                 var host = xml.Element("dm_server").Value;
                 var port = int.Parse(xml.Element("dm_port").Value);
 
                 // 链接房间
-                var uid = (long)(100000000000000.0 + 200000000000000.0 * new Random().NextDouble());
-                var param2 = $"{{\"roomid\":{roomId},\"uid\":{uid}}}";
-                byte[] head = { 0x00, 0x10, 0x00, 0x01 };
-                byte[] cmd = { 0x00, 0x00, 0x00, 0x07 };
-                byte[] param1 = { 0x00, 0x00, 0x00, 0x01 };
-                var data = new List<byte>();
-                data.AddRange(head);
-                data.AddRange(cmd);
-                data.AddRange(param1);
-                data.AddRange(Encoding.ASCII.GetBytes(param2));
-                Int32 length = data.Count + 4;
-                var header = BitConverter.GetBytes(length);
-                Array.Reverse(header);
-                data.InsertRange(0, header);
+                var data = OpenMsg(roomId);
                 Console.WriteLine($"Connect to Room {roomId} on {host}:{port}");
-                tcpClient.NoDelay = true;
-                await tcpClient.ConnectAsync(host, port);
 
+                // 连接服务器
+                await tcpClient.ConnectAsync(host, port);
                 using (var stream = tcpClient.GetStream())
                 {
-                    stream.Write(data.ToArray(), 0, data.Count);
+                    stream.Write(data, 0, data.Length);
 
                     heartbeat = Task.Run(() =>
                     {
                         var at = DateTimeOffset.Now.ToUnixTimeSeconds();
-                        Byte[] heartBeat = { 0x00, 0x00, 0x00, 0x10,
-                                             0x00, 0x10, 0x00, 0x01,
-                                             0x00, 0x00, 0x00, 0x02,
-                                             0x00, 0x00, 0x00, 0x01 };
+                        Byte[] heartBeat = HeartbeatMsg();
                         while (true)
                         {
                             if (tcpClient.Connected && stream.CanWrite)
@@ -126,6 +116,32 @@ namespace DanMuJi.Bilibili
             }
         }
 
+        private byte[] OpenMsg(string roomId)
+        {
+            var uid = (long)(100000000000000.0 + 200000000000000.0 * new Random().NextDouble());
+            var param2 = $"{{\"roomid\":{roomId},\"uid\":{uid}}}";
+            byte[] head = { 0x00, 0x10, 0x00, 0x01 };
+            byte[] cmd = { 0x00, 0x00, 0x00, 0x07 };
+            byte[] param1 = { 0x00, 0x00, 0x00, 0x01 };
+            var data = new List<byte>();
+            data.AddRange(head);
+            data.AddRange(cmd);
+            data.AddRange(param1);
+            data.AddRange(Encoding.ASCII.GetBytes(param2));
+            Int32 length = data.Count + 4;
+            var header = BitConverter.GetBytes(IPAddress.HostToNetworkOrder(length));
+            data.InsertRange(0, header);
 
+            return data.ToArray();
+        }
+
+        private byte[] HeartbeatMsg()
+        {
+            byte[] ret = { 0x00, 0x00, 0x00, 0x10,
+                            0x00, 0x10, 0x00, 0x01,
+                            0x00, 0x00, 0x00, 0x02,
+                            0x00, 0x00, 0x00, 0x01 };
+            return ret;
+        }
     }
 }
