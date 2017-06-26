@@ -59,7 +59,7 @@ namespace DanMuJi.Douyu
                         {
                             Console.WriteLine(respText);
                         }
-                    });
+                    },true,false);
 
                     runner.run();
                     //var heartbeat = Task.Run(() =>

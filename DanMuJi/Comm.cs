@@ -67,13 +67,14 @@ namespace DanMuJi
         private OnHeartbeat onHeartbeat;
         private OnMessage onMessage;
         private bool isLittle;
-
-        public TcpRunner(Stream stream, OnHeartbeat onHeartbeat, OnMessage onMessage, bool isLittle = true)
+        private bool withHeader;
+        public TcpRunner(Stream stream, OnHeartbeat onHeartbeat, OnMessage onMessage, bool isLittle = true, bool withHeader = true)
         {
             this.stream = stream;
             this.onHeartbeat = onHeartbeat;
             this.onMessage = onMessage;
             this.isLittle = isLittle;
+            this.withHeader = withHeader;
         }
 
         public void run()
@@ -113,12 +114,16 @@ namespace DanMuJi
                         {
                             len = IPAddress.NetworkToHostOrder(len);
                         }
-                        var MsgLength = len;
-                        buffer = new Byte[MsgLength];
-                        var recievedByte = 0;
-                        while (recievedByte < MsgLength)
+                        if (withHeader == true)
                         {
-                            recievedByte += await stream.ReadAsync(buffer, recievedByte, MsgLength - recievedByte);
+                            len -= 4;
+                        }
+                        
+                        buffer = new Byte[len];
+                        var recievedByte = 0;
+                        while (recievedByte < len)
+                        {
+                            recievedByte += await stream.ReadAsync(buffer, recievedByte, len - recievedByte);
                         }
                         onMessage(buffer);
                         Debug.WriteLine(BitConverter.ToString(buffer));
