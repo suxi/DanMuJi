@@ -54,9 +54,9 @@ namespace DanMuJi.Bilibili
                 await tcpClient.ConnectAsync(host, port);
                 using (var stream = tcpClient.GetStream())
                 {
-                    stream.Write(data, 0, data.Length);
+                    await stream.WriteAsync(data, 0, data.Length);
 
-                    heartbeat = Task.Run(() =>
+                    heartbeat = Task.Run(async () =>
                     {
                         var at = DateTimeOffset.Now.ToUnixTimeSeconds();
                         Byte[] heartBeat = HeartbeatMsg();
@@ -65,7 +65,7 @@ namespace DanMuJi.Bilibili
                             if (tcpClient.Connected && stream.CanWrite)
                             {
                                 SpinWait.SpinUntil(() => DateTimeOffset.Now.ToUnixTimeSeconds() - at >= 29);
-                                stream.Write(heartBeat, 0, heartBeat.Length);
+                                await stream.WriteAsync(heartBeat, 0, heartBeat.Length);
                                 at = DateTimeOffset.Now.ToUnixTimeSeconds();
                                 Debug.WriteLine("Heartbeat");
                             }
@@ -77,7 +77,7 @@ namespace DanMuJi.Bilibili
                         }
                     });
 
-                    reciever = Task.Run(() =>
+                    reciever = Task.Run(async () =>
                     {
                         var buffer = new Byte[4];
                         var at = DateTimeOffset.Now.ToUnixTimeMilliseconds();
@@ -86,13 +86,13 @@ namespace DanMuJi.Bilibili
                             if (tcpClient.Available > 0 && stream.CanRead)
                             {
                                 buffer = new Byte[4];
-                                stream.Read(buffer, 0, 4);
+                                await stream.ReadAsync(buffer, 0, 4);
                                 var MsgLength = IPAddress.NetworkToHostOrder(BitConverter.ToInt32(buffer, 0)) - 4;
                                 buffer = new Byte[MsgLength];
                                 var recievedByte = 0;
                                 while (recievedByte < MsgLength)
                                 {
-                                    recievedByte += stream.Read(buffer, recievedByte, MsgLength - recievedByte);
+                                    recievedByte += await stream.ReadAsync (buffer, recievedByte, MsgLength - recievedByte);
                                 }
                                 var respText = parser.ParsePackage(buffer);
                                 if (!string.IsNullOrWhiteSpace(respText))
