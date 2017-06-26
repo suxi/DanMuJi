@@ -6,7 +6,7 @@ namespace DanMuJiCore
     {
         static void Main(string[] args)
         {
-            var client = new DanMuJi.Bilibili.DanMuJi();
+            var client = DanMuJi.DanMuJiFactory.Make(DanMuJi.DanMuJiFactory.ParseUrl(args[0]));
             if (args.Length < 1)
             {
                 Console.WriteLine("DanMuJiCore <url>");
